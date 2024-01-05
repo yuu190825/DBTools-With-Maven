@@ -29,7 +29,7 @@ private class StartButton {
             window.start()
 
             val record = try { window.record.text.toShort() } catch (nfe: NumberFormatException) { DEFAULT_RECORD }
-            val total = try { window.total.text.toLong() } catch (nfe: NumberFormatException) { 0 }
+            val total = try { window.total.text.toLong() } catch (nfe: NumberFormatException) { 1 }
 
             if (window.tabNameList.isNotEmpty()) {
                 for (tabName in window.tabNameList) {
