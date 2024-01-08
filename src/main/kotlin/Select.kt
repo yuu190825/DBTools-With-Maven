@@ -51,7 +51,7 @@ class Select(
 
             while (rs.next()) {
                 val metadata = rs.metaData
-                for (i in 1 .. metadata.columnCount) if (metadata.getColumnTypeName(i).equals("BLOB") ||
+                for (i in 1..metadata.columnCount) if (metadata.getColumnTypeName(i).equals("BLOB") ||
                     metadata.getColumnTypeName(i).equals("timestamp") ||
                     metadata.getColumnTypeName(i).equals("varbinary"))
                     toDeleteColNameList.add(metadata.getColumnName(i))

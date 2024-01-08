@@ -19,30 +19,30 @@ class CsvFileWriter(
 
             bw.write("Not in $dbName:\n")
 
-            for (i in 0 ..< notInDBA.size) {
+            for (i in 0 until notInDBA.size) {
                 bw.write(notInDBA[i][0].toString())
 
-                for (j in 1..< notInDBA[i].size) bw.write(", ${notInDBA[i][j].toString()}")
+                for (j in 1 until notInDBA[i].size) bw.write(", ${notInDBA[i][j].toString()}")
 
                 bw.newLine()
             }
 
             bw.write("\nAdd in $dbName:\n")
 
-            for (i in 0 ..< addInDBA.size) {
+            for (i in 0 until addInDBA.size) {
                 bw.write(addInDBA[i][0].toString())
 
-                for (j in 1..< addInDBA[i].size) bw.write(", ${addInDBA[i][j].toString()}")
+                for (j in 1 until addInDBA[i].size) bw.write(", ${addInDBA[i][j].toString()}")
 
                 bw.newLine()
             }
 
             bw.write("\nNot equal in $dbName:\n")
 
-            for (i in 0 ..< xorInDBA.size) {
+            for (i in 0 until xorInDBA.size) {
                 bw.write(xorInDBA[i][0].toString())
 
-                for (j in 1..< xorInDBA[i].size) bw.write(", ${xorInDBA[i][j].toString()}")
+                for (j in 1 until xorInDBA[i].size) bw.write(", ${xorInDBA[i][j].toString()}")
 
                 bw.newLine()
             }

@@ -102,7 +102,7 @@ class Execute(
                     } else {
                         statusBox.append("Running SqlFileWriter...\n")
 
-                        for (i in 0..<sqlStringPackages.size) sqlFileWriterList.add(
+                        for (i in 0 until sqlStringPackages.size) sqlFileWriterList.add(
                             SqlFileWriter(tabName, from, to, i + 1, idInsert, sqlStringPackages[i]))
 
                         for (sqlFileWriterThread in sqlFileWriterList) sqlFileWriterThread.start()
