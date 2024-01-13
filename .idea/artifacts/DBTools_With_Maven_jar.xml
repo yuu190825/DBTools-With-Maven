@@ -1,0 +1,16 @@
+<component name="ArtifactManager">
+  <artifact name="DBTools-With-Maven:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/DBTools_With_Maven_jar</output-path>
+    <root id="root">
+      <element id="archive" name="DBTools-With-Maven.jar">
+        <element id="module-output" name="DBTools-With-Maven" />
+      </element>
+      <element id="library" level="project" name="Maven: com.google.protobuf:protobuf-java:3.21.9" />
+      <element id="library" level="project" name="Maven: com.mysql:mysql-connector-j:8.2.0" />
+      <element id="library" level="project" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.9.21" />
+      <element id="library" level="project" name="Maven: com.microsoft.sqlserver:mssql-jdbc:12.4.2.jre11" />
+      <element id="library" level="project" name="Maven: org.jetbrains:annotations:13.0" />
+      <element id="library" level="project" name="Maven: com.oracle.database.jdbc:ojdbc11:23.3.0.23.09" />
+    </root>
+  </artifact>
+</component>

@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Main-Class: MainKt
+Class-Path: protobuf-java-3.21.9.jar mysql-connector-j-8.2.0.jar kotlin-
+ stdlib-1.9.21.jar mssql-jdbc-12.4.2.jre11.jar annotations-13.0.jar ojdb
+ c11-23.3.0.23.09.jar
+

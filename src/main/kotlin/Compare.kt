@@ -11,10 +11,10 @@ class Compare(
         val tempColValueListsB = colValueListsB.minus(colValueListsA.toSet())
 
         val idInTempColValueListsA = mutableListOf<Any?>()
-        for (id in tempColValueListsA) idInTempColValueListsA.add(id[0])
+        for (colValueList in tempColValueListsA) idInTempColValueListsA.add(colValueList[0])
 
         val idInTempColValueListsB = mutableListOf<Any?>()
-        for (id in tempColValueListsB) idInTempColValueListsB.add(id[0])
+        for (colValueList in tempColValueListsB) idInTempColValueListsB.add(colValueList[0])
 
         for (colValueList in tempColValueListsB)
             if (!idInTempColValueListsA.contains(colValueList[0])) notInDBA.add(colValueList)
