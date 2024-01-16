@@ -1,3 +1,5 @@
+package com.itoria.dbtools
+
 import java.sql.*
 import javax.swing.JTextArea
 

@@ -1,3 +1,5 @@
+package com.itoria.dbtools
+
 // SQL Query in Oracle DB(1)
 private const val SELECT_COLUMN_NAME_IN_ORACLE_DB = "SELECT COLUMN_NAME FROM ALL_TAB_COLUMNS WHERE OWNER ="
 private const val SELECT_COLUMN_NAME_FROM_IN_ORACLE_DB = "AND TABLE_NAME ="

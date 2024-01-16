@@ -1,3 +1,5 @@
+package com.itoria.dbtools
+
 class SqlStringCreate(
     private val tabName: String,
     private val colNameList: MutableSet<String>,

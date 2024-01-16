@@ -1,3 +1,5 @@
+package com.itoria.dbtools
+
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import javax.swing.*
@@ -54,6 +56,7 @@ class Window {
 
         // Set Window & Panel
         window.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+        window.isResizable = false
         window.title = "DBTools"
         window.setSize(600, 700)
         panel.layout = null

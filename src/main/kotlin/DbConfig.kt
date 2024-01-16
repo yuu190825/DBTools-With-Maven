@@ -1,3 +1,5 @@
+package com.itoria.dbtools
+
 // SQL Config in Oracle DB(1)
 private const val ORACLE_JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver"
 private const val ORACLE_DB_URL = "jdbc:oracle:thin:@"

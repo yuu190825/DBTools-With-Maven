@@ -1,3 +1,5 @@
+package com.itoria.dbtools
+
 class Compare(
     private val colValueListsA: MutableList<MutableList<Any?>>,
     private val colValueListsB: MutableList<MutableList<Any?>>

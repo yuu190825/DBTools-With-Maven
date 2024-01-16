@@ -1,3 +1,5 @@
+package com.itoria.dbtools
+
 import javax.swing.JTextArea
 
 class Execute(
