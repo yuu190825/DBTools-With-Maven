@@ -2,6 +2,7 @@ package com.itoria.dbtools
 
 class SqlStringCreate(
     private val tabName: String,
+    private val idInsert: Boolean,
     private val colNameList: MutableSet<String>,
     private val colValueLists: MutableList<MutableList<Any?>>
 ): Thread() {
@@ -9,7 +10,9 @@ class SqlStringCreate(
 
     override fun run() {
         for (colValueList in colValueLists) {
-            val sqlString = StringBuilder("INSERT INTO $tabName(${colNameList.elementAt(0)}")
+            val sqlString = if (idInsert) StringBuilder("SET IDENTITY_INSERT $tabName ON; INSERT INTO $tabName(" +
+                    colNameList.elementAt(0))
+            else StringBuilder("INSERT INTO $tabName(${colNameList.elementAt(0)}")
 
             for (i in 1 until colNameList.size) sqlString.append(", ${colNameList.elementAt(i)}")
 

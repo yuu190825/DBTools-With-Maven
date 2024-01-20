@@ -6,7 +6,7 @@ import javax.swing.JOptionPane
 
 // Main Config
 private const val DEFAULT_RECORD: Short = 5000
-private const val MAX: Long = 500000
+private const val MAX = 500000
 
 // Window Init
 private val window = Window()
@@ -31,38 +31,38 @@ private class StartButton {
             window.start()
 
             val record = try { window.record.text.toShort() } catch (nfe: NumberFormatException) { DEFAULT_RECORD }
-            val total = try { window.total.text.toLong() } catch (nfe: NumberFormatException) { 1 }
+            val total = try { window.total.text.toInt() } catch (nfe: NumberFormatException) { 1 }
 
             if (window.tabNameList.isNotEmpty()) {
                 for (tabName in window.tabNameList) {
                     if (!error) {
-                        var from: Long = if (window.fromDbType.toInt() == 3) 0 else 1
-                        var to: Long = MAX
+                        var from = if (window.fromDbType == 3.toByte()) 0 else 1
+                        var to = MAX
 
                         while (from <= total) {
                             val execute = Execute(window.fromDbType, window.fromDbUrl.text, window.fromDbSid.text,
                                 window.fromDbName.text, window.fromDbUser.text, String(window.fromDbPass.password),
                                 window.toDbType, window.toDbUrl.text, window.toDbSid.text, window.toDbName.text,
-                                window.toDbUser.text, String(window.toDbPass.password), window.func, window.idInsert,
-                                record, tabName, window.where.text, from, to, window.statusBox)
+                                window.toDbUser.text, String(window.toDbPass.password), window.func, window.mode,
+                                window.idInsert, record, tabName, window.where.text, from, to, window.statusBox)
 
-                            execute.start(window.mode)
+                            execute.start()
 
                             warning += execute.warning
                             error = execute.error
 
                             if (!error) {
-                                if (window.func.toInt() == 2) {
+                                if (window.func == 2.toByte()) {
                                     colValueListsA.addAll(execute.colValueListsA)
                                     colValueListsB.addAll(execute.colValueListsB)
                                 }
 
                                 from += MAX
-                                if (window.fromDbType.toInt() != 3) to += MAX
+                                if (window.fromDbType != 3.toByte()) to += MAX
                             } else break
                         }
 
-                        if (!error && window.func.toInt() == 2) {
+                        if (!error && window.func == 2.toByte()) {
                             val compare = Compare(colValueListsA, colValueListsB)
 
                             compare.start()

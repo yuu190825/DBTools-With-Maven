@@ -345,18 +345,27 @@ class Window {
                     rdBtnToDbTypeOne.isSelected = true
                     rdBtnToDbTypeTwo.isSelected = false
                     rdBtnToDbTypeThree.isSelected = false
+
+                    idInsert = false
+                    chBoxSetIdInsert.isEnabled = false
                 }
                 "to SQL Server" -> {
                     toDbType = 2
                     rdBtnToDbTypeOne.isSelected = false
                     rdBtnToDbTypeTwo.isSelected = true
                     rdBtnToDbTypeThree.isSelected = false
+
+                    idInsert = chBoxSetIdInsert.isSelected
+                    chBoxSetIdInsert.isEnabled = true
                 }
                 "to MySQL" -> {
                     toDbType = 3
                     rdBtnToDbTypeOne.isSelected = false
                     rdBtnToDbTypeTwo.isSelected = false
                     rdBtnToDbTypeThree.isSelected = true
+
+                    idInsert = false
+                    chBoxSetIdInsert.isEnabled = false
                 }
                 // End
 

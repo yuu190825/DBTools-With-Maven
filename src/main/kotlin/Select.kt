@@ -15,8 +15,8 @@ class Select(
     private val record: Short,
     private val tabName: String,
     private val where: String,
-    private val from: Long,
-    private val to: Long,
+    private val from: Int,
+    private val to: Int,
     private val statusBox: JTextArea
 ): Thread() {
     val colNameList = mutableSetOf<String>()
@@ -33,7 +33,7 @@ class Select(
 
         try {
             Class.forName(DbConfig().getJdbcDriver(dbType))
-            conn = if (dbType.toInt() == 1) DriverManager.getConnection(
+            conn = if (dbType == 1.toByte()) DriverManager.getConnection(
                 DbConfig().getDbUrl(dbType, dbUrl, dbSid), dbUser, dbPass)
             else DriverManager.getConnection(DbConfig().getDbUrl(dbType, dbUrl, dbName), dbUser, dbPass)
             stmt = conn.createStatement()
@@ -66,7 +66,7 @@ class Select(
             statusBox.append("Getting COLUMN_VALUE...\n")
 
             var finalWhere = ""
-            if (dbType.toInt() == 1) for (colName in colNameList) finalWhere = where.replace(colName,
+            if (dbType == 1.toByte()) for (colName in colNameList) finalWhere = where.replace(colName,
                 "T.$colName", true)
             else finalWhere = where
 
@@ -76,7 +76,7 @@ class Select(
             while (rs.next()) {
                 val colValueList = mutableListOf<Any?>()
                 for (colName in colNameList) {
-                    if (func.toInt() == 1) {
+                    if (func == 1.toByte()) {
                         try { colValueList.add(rs.getTimestamp(colName)) } catch (e: Exception) {
                             colValueList.add(rs.getString(colName).replace("'", "''")) } // '
                     } else {
@@ -87,16 +87,16 @@ class Select(
                     }
                 }
 
-                if (func.toInt() == 1) colValueListsA.add(colValueList) else {
-                    if (step.toInt() == 1) colValueListsA.add(colValueList) else colValueListsB.add(colValueList) }
+                if (func == 1.toByte()) colValueListsA.add(colValueList) else {
+                    if (step == 1.toByte()) colValueListsA.add(colValueList) else colValueListsB.add(colValueList) }
 
-                if (func.toInt() == 1 && colValueListsA.size.toShort() == record) {
+                if (func == 1.toByte() && colValueListsA.size.toShort() == record) {
                     colValuePackages.add(colValueListsA)
                     colValueListsA = mutableListOf()
                 }
             }
 
-            if (func.toInt() == 1 && colValueListsA.isNotEmpty()) colValuePackages.add(colValueListsA)
+            if (func == 1.toByte() && colValueListsA.isNotEmpty()) colValuePackages.add(colValueListsA)
             // End
 
         } catch (e: Exception) { error = true } finally {

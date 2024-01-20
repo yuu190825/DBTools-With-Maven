@@ -13,7 +13,7 @@ class InsertInto(
     private val dbPass: String,
     private val sqlStringListIn: MutableList<String>
 ): Thread() {
-    var warning = 0
+    var warning: Short = 0
     val sqlStringListOut = mutableListOf<String>()
     var error = false
 

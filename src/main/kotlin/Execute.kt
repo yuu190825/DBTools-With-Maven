@@ -1,5 +1,9 @@
 package com.itoria.dbtools
 
+import java.sql.Connection
+import java.sql.DriverManager
+import java.sql.SQLException
+import java.sql.Statement
 import javax.swing.JTextArea
 
 class Execute(
@@ -16,12 +20,13 @@ class Execute(
     private val toDbUser: String,
     private val toDbPass: String,
     private val func: Byte,
+    private val mode: Byte,
     private val idInsert: Boolean,
     private val record: Short,
     private val tabName: String,
     private val where: String,
-    private val from: Long,
-    private val to: Long,
+    private val from: Int,
+    private val to: Int,
     private val statusBox: JTextArea
 ) {
     val colValueListsA = mutableListOf<MutableList<Any?>>()
@@ -32,7 +37,7 @@ class Execute(
 
     init { statusBox.append("$tabName from $from to $to\n") }
 
-    fun start(mode: Byte) {
+    fun start() {
         val sqlStringPackages = mutableListOf<MutableList<String>>()
         val sqlStringCreateList = mutableListOf<SqlStringCreate>()
         val insertIntoList = mutableListOf<InsertInto>()
@@ -44,9 +49,9 @@ class Execute(
             where, from, to, statusBox)
 
         selectA.start()
-        if (func.toInt() == 2) selectB.start()
+        if (func == 2.toByte()) selectB.start()
 
-        if (func.toInt() == 1) {
+        if (func == 1.toByte()) {
             try { selectA.join() } catch (ie: InterruptedException) { error = true }
 
             error = selectA.error
@@ -60,11 +65,11 @@ class Execute(
         }
 
         if (!error) {
-            if (func.toInt() == 1) {
+            if (func == 1.toByte()) {
                 statusBox.append("Running SqlStringCreate...\n")
 
                 for (clValuePackage in selectA.colValuePackages) sqlStringCreateList.add(
-                    SqlStringCreate(tabName, selectA.colNameList, clValuePackage))
+                    SqlStringCreate(tabName, idInsert, selectA.colNameList, clValuePackage))
 
                 for (sqlStringCreateThread in sqlStringCreateList) sqlStringCreateThread.start()
 
@@ -75,20 +80,62 @@ class Execute(
                 }
 
                 if (!error) {
-                    if (mode.toInt() == 2) {
-                        statusBox.append("Running InsertInto...\n")
+                    if (mode == 2.toByte()) {
+                        var conn: Connection? = null
+                        var stmt: Statement? = null
 
-                        for (sqlStringListPackage in sqlStringPackages) insertIntoList.add(
-                            InsertInto(toDbType, toDbUrl, toDbName, toDbUser, toDbPass, sqlStringListPackage))
+                        try {
+                            Class.forName(DbConfig().getJdbcDriver(toDbType))
+                            conn = if (toDbType == 1.toByte()) DriverManager.getConnection(
+                                DbConfig().getDbUrl(toDbType, toDbUrl, toDbSid), toDbUser, toDbPass)
+                            else DriverManager.getConnection(DbConfig().getDbUrl(toDbType, toDbUrl, toDbName), toDbUser,
+                                toDbPass)
+                            stmt = conn?.createStatement()
 
-                        for (insertIntoThread in insertIntoList) insertIntoThread.start()
+                            stmt?.executeUpdate("TRUNCATE TABLE $tabName")
+                        } catch (e: Exception) {error = true} finally {
+                            try {
+                                stmt?.close()
+                                conn?.close()
+                            } catch (sqe: SQLException) { error = true }
+                        }
 
-                        for (insertIntoThread in insertIntoList) {
-                            try { insertIntoThread.join() } catch (ie: InterruptedException) { error = true }
+                        if (!error) {
+                            statusBox.append("Running InsertInto...\n")
 
-                            warning += insertIntoThread.warning
-                            errorSqlStringList.addAll(insertIntoThread.sqlStringListOut)
-                            if (!error) error = insertIntoThread.error
+                            for (sqlStringListPackage in sqlStringPackages) insertIntoList.add(
+                                InsertInto(toDbType, toDbUrl, toDbName, toDbUser, toDbPass, sqlStringListPackage)
+                            )
+
+                            for (insertIntoThread in insertIntoList) insertIntoThread.start()
+
+                            for (insertIntoThread in insertIntoList) {
+                                try {
+                                    insertIntoThread.join()
+                                } catch (ie: InterruptedException) {
+                                    error = true
+                                }
+
+                                warning += insertIntoThread.warning
+                                errorSqlStringList.addAll(insertIntoThread.sqlStringListOut)
+                                if (!error) error = insertIntoThread.error
+                            }
+
+                            if (!error && idInsert) {
+                                try {
+                                    Class.forName(DbConfig().getJdbcDriver(toDbType))
+                                    conn = DriverManager.getConnection(DbConfig().getDbUrl(toDbType, toDbUrl, toDbName),
+                                        toDbUser, toDbPass)
+                                    stmt = conn?.createStatement()
+
+                                    stmt?.executeUpdate("SET IDENTITY_INSERT $tabName OFF")
+                                } catch (e: Exception) {error = true} finally {
+                                    try {
+                                        stmt?.close()
+                                        conn?.close()
+                                    } catch (sqe: SQLException) { error = true }
+                                }
+                            }
                         }
 
                         if (!error && warning > 0) {

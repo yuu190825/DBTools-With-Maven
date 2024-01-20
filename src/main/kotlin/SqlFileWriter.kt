@@ -6,8 +6,8 @@ import java.io.IOException
 
 class SqlFileWriter(
     private val tabName: String,
-    private val from: Long,
-    private val to: Long,
+    private val from: Int,
+    private val to: Int,
     private val fileNumber: Int,
     private val idInsert: Boolean,
     private val sqlStringList: MutableList<String>
