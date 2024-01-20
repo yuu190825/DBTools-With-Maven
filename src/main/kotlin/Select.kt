@@ -11,7 +11,6 @@ class Select(
     private val dbUser: String,
     private val dbPass: String,
     private val func: Byte,
-    private val step: Byte,
     private val record: Short,
     private val tabName: String,
     private val where: String,
@@ -21,8 +20,7 @@ class Select(
 ): Thread() {
     val colNameList = mutableSetOf<String>()
     private val toDeleteColNameList = mutableSetOf<String>()
-    var colValueListsA = mutableListOf<MutableList<Any?>>()
-    val colValueListsB = mutableListOf<MutableList<Any?>>()
+    var colValueLists = mutableListOf<MutableList<Any?>>()
     val colValuePackages = mutableListOf<MutableList<MutableList<Any?>>>()
     var error = false
 
@@ -53,10 +51,13 @@ class Select(
 
             while (rs.next()) {
                 val metadata = rs.metaData
-                for (i in 1..metadata.columnCount) if (metadata.getColumnTypeName(i).equals("BLOB") ||
-                    metadata.getColumnTypeName(i).equals("timestamp") ||
-                    metadata.getColumnTypeName(i).equals("varbinary"))
-                    toDeleteColNameList.add(metadata.getColumnName(i))
+                for (i in 1..metadata.columnCount) {
+                    if (
+                        metadata.getColumnTypeName(i).equals("BLOB") ||
+                        metadata.getColumnTypeName(i).equals("timestamp") ||
+                        metadata.getColumnTypeName(i).equals("varbinary")
+                    ) toDeleteColNameList.add(metadata.getColumnName(i))
+                }
             }
 
             for (colName in toDeleteColNameList) colNameList.remove(colName)
@@ -87,24 +88,18 @@ class Select(
                     }
                 }
 
-                if (func == 1.toByte()) colValueListsA.add(colValueList) else {
-                    if (step == 1.toByte()) colValueListsA.add(colValueList) else colValueListsB.add(colValueList) }
+                colValueLists.add(colValueList)
 
-                if (func == 1.toByte() && colValueListsA.size.toShort() == record) {
-                    colValuePackages.add(colValueListsA)
-                    colValueListsA = mutableListOf()
+                if (func == 1.toByte() && colValueLists.size.toShort() == record) {
+                    colValuePackages.add(colValueLists); colValueLists = mutableListOf()
                 }
             }
 
-            if (func == 1.toByte() && colValueListsA.isNotEmpty()) colValuePackages.add(colValueListsA)
+            if (func == 1.toByte() && colValueLists.isNotEmpty()) colValuePackages.add(colValueLists)
             // End
 
         } catch (e: Exception) { error = true } finally {
-            try {
-                rs?.close()
-                stmt?.close()
-                conn?.close()
-            } catch (sqe: SQLException) { error = true }
+            try { rs?.close(); stmt?.close(); conn?.close() } catch (sqe: SQLException) { error = true }
         }
     }
 }

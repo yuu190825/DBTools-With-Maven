@@ -5,20 +5,20 @@ import java.sql.DriverManager
 import java.sql.SQLException
 import java.sql.Statement
 
-class InsertInto(
+class Delete(
     private val dbType: Byte,
     private val dbUrl: String,
     private val dbSid: String,
     private val dbName: String,
     private val dbUser: String,
     private val dbPass: String,
-    private val sqlStringListIn: MutableList<String>
-): Thread() {
-    var warning: Short = 0
-    val sqlStringListOut = mutableListOf<String>()
+    private val tabName: String,
+    private val idColName: String,
+    private val toDeleteIdList: MutableList<String>
+) {
     var error = false
 
-    override fun run() {
+    fun start() {
         var conn: Connection? = null
         var stmt: Statement? = null
 
@@ -31,11 +31,7 @@ class InsertInto(
         } catch (e: Exception) { error = true }
 
         if (!error) {
-            for (sqlString in sqlStringListIn) {
-                try { stmt?.executeUpdate(sqlString) } catch (sqe: SQLException) { // INSERT INTO
-                    warning++; sqlStringListOut.add(sqlString)
-                }
-            }
+            for (id in toDeleteIdList) stmt?.executeUpdate("DELETE FROM $tabName WHERE $idColName = $id") // DELETE
 
             try { stmt?.close(); conn?.close() } catch (sqe: SQLException) { error = true }
         }

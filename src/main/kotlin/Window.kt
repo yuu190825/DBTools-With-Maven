@@ -43,6 +43,7 @@ class Window {
     private val rdBtnToDbTypeThree = JRadioButton("MySQL")
     private val rdBtnFuncOne = JRadioButton("Transfer")
     private val rdBtnFuncTwo = JRadioButton("Compare")
+    private val rdBtnFuncThree = JRadioButton("Sync")
     private val rdBtnModeOne = JRadioButton("To File")
     private val rdBtnModeTwo = JRadioButton("To DB")
     private val chBoxSetIdInsert = JCheckBox()
@@ -55,224 +56,166 @@ class Window {
     fun print() {
 
         // Set Window & Panel
+        window.title = "DBTools"; window.setSize(600, 700); window.isResizable = false
         window.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-        window.isResizable = false
-        window.title = "DBTools"
-        window.setSize(600, 700)
-        panel.layout = null
-        window.contentPane = panel
+        panel.layout = null; window.contentPane = panel
         // End
 
         // Set Block 1 (To DB Setter)
         val lblFromDbType = JLabel("From DB Type:")
-        lblFromDbType.setBounds(5, 0, 295, 25)
-        panel.add(lblFromDbType)
+        lblFromDbType.setBounds(5, 0, 295, 25); panel.add(lblFromDbType)
 
-        rdBtnFromDbTypeOne.setBounds(0, 25, 100, 25)
         rdBtnFromDbTypeOne.actionCommand = "from Oracle DB"
         rdBtnFromDbTypeOne.addActionListener(UnionRadioButtonActionListener())
-        panel.add(rdBtnFromDbTypeOne)
+        rdBtnFromDbTypeOne.setBounds(0, 25, 100, 25); panel.add(rdBtnFromDbTypeOne)
 
-        rdBtnFromDbTypeTwo.setBounds(100, 25, 100, 25)
         rdBtnFromDbTypeTwo.actionCommand = "from SQL Server"
         rdBtnFromDbTypeTwo.addActionListener(UnionRadioButtonActionListener())
-        panel.add(rdBtnFromDbTypeTwo)
+        rdBtnFromDbTypeTwo.setBounds(100, 25, 100, 25); panel.add(rdBtnFromDbTypeTwo)
 
-        rdBtnFromDbTypeThree.setBounds(200, 25, 100, 25)
-        rdBtnFromDbTypeThree.isSelected = true
         rdBtnFromDbTypeThree.actionCommand = "from MySQL"
         rdBtnFromDbTypeThree.addActionListener(UnionRadioButtonActionListener())
-        panel.add(rdBtnFromDbTypeThree)
+        rdBtnFromDbTypeThree.isSelected = true
+        rdBtnFromDbTypeThree.setBounds(200, 25, 100, 25); panel.add(rdBtnFromDbTypeThree)
 
         val lblFromDbUrl = JLabel("From DB URL:")
-        lblFromDbUrl.setBounds(5, 50, 145, 25)
-        panel.add(lblFromDbUrl)
+        lblFromDbUrl.setBounds(5, 50, 145, 25); panel.add(lblFromDbUrl)
 
         val lblFromDbSid = JLabel("From DB SID:")
-        lblFromDbSid.setBounds(155, 50, 145, 25)
-        panel.add(lblFromDbSid)
+        lblFromDbSid.setBounds(155, 50, 145, 25); panel.add(lblFromDbSid)
 
-        fromDbUrl.setBounds(0, 75, 150, 25)
-        panel.add(fromDbUrl)
+        fromDbUrl.setBounds(0, 75, 150, 25); panel.add(fromDbUrl)
 
-        fromDbSid.setBounds(150, 75, 150, 25)
-        panel.add(fromDbSid)
+        fromDbSid.setBounds(150, 75, 150, 25); panel.add(fromDbSid)
 
         val lblFromDbName = JLabel("From DB Name:")
-        lblFromDbName.setBounds(5, 100, 295, 25)
-        panel.add(lblFromDbName)
+        lblFromDbName.setBounds(5, 100, 295, 25); panel.add(lblFromDbName)
 
-        fromDbName.setBounds(0, 125, 300, 25)
-        panel.add(fromDbName)
+        fromDbName.setBounds(0, 125, 300, 25); panel.add(fromDbName)
 
         val lblFromDbUser = JLabel("From DB Username:")
-        lblFromDbUser.setBounds(5, 150, 295, 25)
-        panel.add(lblFromDbUser)
+        lblFromDbUser.setBounds(5, 150, 295, 25); panel.add(lblFromDbUser)
 
-        fromDbUser.setBounds(0, 175, 300, 25)
-        panel.add(fromDbUser)
+        fromDbUser.setBounds(0, 175, 300, 25); panel.add(fromDbUser)
 
         val lblFromDbPass = JLabel("From DB Password:")
-        lblFromDbPass.setBounds(5, 200, 295, 25)
-        panel.add(lblFromDbPass)
+        lblFromDbPass.setBounds(5, 200, 295, 25); panel.add(lblFromDbPass)
 
-        fromDbPass.setBounds(0, 225, 300, 25)
-        panel.add(fromDbPass)
+        fromDbPass.setBounds(0, 225, 300, 25); panel.add(fromDbPass)
         // End
 
         // Set Block 2 (To DB Setter)
         val lblToDbType = JLabel("To DB Type:")
-        lblToDbType.setBounds(5, 250, 295, 25)
-        panel.add(lblToDbType)
+        lblToDbType.setBounds(5, 250, 295, 25); panel.add(lblToDbType)
 
-        rdBtnToDbTypeOne.setBounds(0, 275, 100, 25)
         rdBtnToDbTypeOne.actionCommand = "to Oracle DB"
         rdBtnToDbTypeOne.addActionListener(UnionRadioButtonActionListener())
-        panel.add(rdBtnToDbTypeOne)
+        rdBtnToDbTypeOne.setBounds(0, 275, 100, 25); panel.add(rdBtnToDbTypeOne)
 
-        rdBtnToDbTypeTwo.setBounds(100, 275, 100, 25)
         rdBtnToDbTypeTwo.actionCommand = "to SQL Server"
         rdBtnToDbTypeTwo.addActionListener(UnionRadioButtonActionListener())
-        panel.add(rdBtnToDbTypeTwo)
+        rdBtnToDbTypeTwo.setBounds(100, 275, 100, 25); panel.add(rdBtnToDbTypeTwo)
 
-        rdBtnToDbTypeThree.setBounds(200, 275, 100, 25)
-        rdBtnToDbTypeThree.isSelected = true
         rdBtnToDbTypeThree.actionCommand = "to MySQL"
         rdBtnToDbTypeThree.addActionListener(UnionRadioButtonActionListener())
-        panel.add(rdBtnToDbTypeThree)
+        rdBtnToDbTypeThree.isSelected = true
+        rdBtnToDbTypeThree.setBounds(200, 275, 100, 25); panel.add(rdBtnToDbTypeThree)
 
         val lblToDbUrl = JLabel("To DB URL:")
-        lblToDbUrl.setBounds(5, 300, 145, 25)
-        panel.add(lblToDbUrl)
+        lblToDbUrl.setBounds(5, 300, 145, 25); panel.add(lblToDbUrl)
 
         val lblToDbSid = JLabel("To DB SID:")
-        lblToDbSid.setBounds(155, 300, 145, 25)
-        panel.add(lblToDbSid)
+        lblToDbSid.setBounds(155, 300, 145, 25); panel.add(lblToDbSid)
 
-        toDbUrl.setBounds(0, 325, 150, 25)
-        panel.add(toDbUrl)
+        toDbUrl.setBounds(0, 325, 150, 25); panel.add(toDbUrl)
 
-        toDbSid.setBounds(150, 325, 150, 25)
-        panel.add(toDbSid)
+        toDbSid.setBounds(150, 325, 150, 25); panel.add(toDbSid)
 
         val lblToDbName = JLabel("To DB Name:")
-        lblToDbName.setBounds(5, 350, 295, 25)
-        panel.add(lblToDbName)
+        lblToDbName.setBounds(5, 350, 295, 25); panel.add(lblToDbName)
 
-        toDbName.setBounds(0, 375, 300, 25)
-        panel.add(toDbName)
+        toDbName.setBounds(0, 375, 300, 25); panel.add(toDbName)
 
         val lblToDbUser = JLabel("To DB Username:")
-        lblToDbUser.setBounds(5, 400, 295, 25)
-        panel.add(lblToDbUser)
+        lblToDbUser.setBounds(5, 400, 295, 25); panel.add(lblToDbUser)
 
-        toDbUser.setBounds(0, 425, 300, 25)
-        panel.add(toDbUser)
+        toDbUser.setBounds(0, 425, 300, 25); panel.add(toDbUser)
 
         val lblToDbPass = JLabel("To DB Password:")
-        lblToDbPass.setBounds(5, 450, 295, 25)
-        panel.add(lblToDbPass)
+        lblToDbPass.setBounds(5, 450, 295, 25); panel.add(lblToDbPass)
 
-        toDbPass.setBounds(0, 475, 300, 25)
-        panel.add(toDbPass)
+        toDbPass.setBounds(0, 475, 300, 25); panel.add(toDbPass)
         // End
 
         // Set Block 3 (Function Setter & Start Button)
         val lblFunc = JLabel("Function Mode:")
-        lblFunc.setBounds(305, 0, 295, 25)
-        panel.add(lblFunc)
+        lblFunc.setBounds(305, 0, 295, 25); panel.add(lblFunc)
 
-        rdBtnFuncOne.setBounds(300, 25, 150, 25)
+        rdBtnFuncOne.actionCommand = "Transfer"; rdBtnFuncOne.addActionListener(UnionRadioButtonActionListener())
         rdBtnFuncOne.isSelected = true
-        rdBtnFuncOne.actionCommand = "Transfer"
-        rdBtnFuncOne.addActionListener(UnionRadioButtonActionListener())
-        panel.add(rdBtnFuncOne)
+        rdBtnFuncOne.setBounds(300, 25, 100, 25); panel.add(rdBtnFuncOne)
 
-        rdBtnFuncTwo.setBounds(450, 25, 150, 25)
-        rdBtnFuncTwo.actionCommand = "Compare"
-        rdBtnFuncTwo.addActionListener(UnionRadioButtonActionListener())
-        panel.add(rdBtnFuncTwo)
+        rdBtnFuncTwo.actionCommand = "Compare"; rdBtnFuncTwo.addActionListener(UnionRadioButtonActionListener())
+        rdBtnFuncTwo.setBounds(400, 25, 100, 25); panel.add(rdBtnFuncTwo)
+
+        rdBtnFuncThree.actionCommand = "Synchronize"; rdBtnFuncThree.addActionListener(UnionRadioButtonActionListener())
+        rdBtnFuncThree.setBounds(500, 25, 100, 25); panel.add(rdBtnFuncThree)
 
         val lblMode = JLabel("Transfer Mode:")
-        lblMode.setBounds(305, 50, 295, 25)
-        panel.add(lblMode)
+        lblMode.setBounds(305, 50, 295, 25); panel.add(lblMode)
 
-        rdBtnModeOne.setBounds(300, 75, 150, 25)
+        rdBtnModeOne.actionCommand = "To File"; rdBtnModeOne.addActionListener(UnionRadioButtonActionListener())
         rdBtnModeOne.isSelected = true
-        rdBtnModeOne.actionCommand = "To File"
-        rdBtnModeOne.addActionListener(UnionRadioButtonActionListener())
-        panel.add(rdBtnModeOne)
+        rdBtnModeOne.setBounds(300, 75, 150, 25); panel.add(rdBtnModeOne)
 
-        rdBtnModeTwo.setBounds(450, 75, 150, 25)
-        rdBtnModeTwo.actionCommand = "To DB"
-        rdBtnModeTwo.addActionListener(UnionRadioButtonActionListener())
-        panel.add(rdBtnModeTwo)
+        rdBtnModeTwo.actionCommand = "To DB"; rdBtnModeTwo.addActionListener(UnionRadioButtonActionListener())
+        rdBtnModeTwo.setBounds(450, 75, 150, 25); panel.add(rdBtnModeTwo)
 
-        chBoxSetIdInsert.setBounds(300, 100, 25, 25)
         chBoxSetIdInsert.addActionListener(SetIdInsert())
-        panel.add(chBoxSetIdInsert)
+        chBoxSetIdInsert.isEnabled = false
+        chBoxSetIdInsert.setBounds(300, 100, 25, 25); panel.add(chBoxSetIdInsert)
 
-        val lblSetIdInsert = JLabel("SET IDENTITY_INSERT ON (To File Only)")
-        lblSetIdInsert.setBounds(325, 100, 270, 25)
-        panel.add(lblSetIdInsert)
+        val lblSetIdInsert = JLabel("SET IDENTITY_INSERT ON")
+        lblSetIdInsert.setBounds(325, 100, 270, 25); panel.add(lblSetIdInsert)
 
         val lblRecord = JLabel("Record:")
-        lblRecord.setBounds(305, 125, 295, 25)
-        panel.add(lblRecord)
+        lblRecord.setBounds(305, 125, 295, 25); panel.add(lblRecord)
 
-        record.setBounds(300, 150, 300, 25)
-        panel.add(record)
+        record.setBounds(300, 150, 300, 25); panel.add(record)
 
         val lblTabName = JLabel("Table Name:")
-        lblTabName.setBounds(305, 175, 295, 25)
-        panel.add(lblTabName)
+        lblTabName.setBounds(305, 175, 295, 25); panel.add(lblTabName)
 
-        tabName.setBounds(300, 200, 300, 25)
-        panel.add(tabName)
+        tabName.setBounds(300, 200, 300, 25); panel.add(tabName)
 
-        btnAddTabName.setBounds(300, 225, 100, 25)
-        btnAddTabName.actionCommand = "Add"
-        btnAddTabName.addActionListener(TabNameListControl())
-        panel.add(btnAddTabName)
+        btnAddTabName.actionCommand = "Add"; btnAddTabName.addActionListener(TabNameListControl())
+        btnAddTabName.setBounds(300, 225, 100, 25); panel.add(btnAddTabName)
 
-        btnRemoveTabName.setBounds(400, 225, 100, 25)
-        btnRemoveTabName.actionCommand = "Remove"
-        btnRemoveTabName.addActionListener(TabNameListControl())
-        panel.add(btnRemoveTabName)
+        btnRemoveTabName.actionCommand = "Remove"; btnRemoveTabName.addActionListener(TabNameListControl())
+        btnRemoveTabName.setBounds(400, 225, 100, 25); panel.add(btnRemoveTabName)
 
-        btnClearTabName.setBounds(500, 225, 100, 25)
-        btnClearTabName.actionCommand = "Clear"
-        btnClearTabName.addActionListener(TabNameListControl())
-        panel.add(btnClearTabName)
+        btnClearTabName.actionCommand = "Clear"; btnClearTabName.addActionListener(TabNameListControl())
+        btnClearTabName.setBounds(500, 225, 100, 25); panel.add(btnClearTabName)
 
         val lblTotalRow = JLabel("Total Row:")
-        lblTotalRow.setBounds(305, 250, 295, 25)
-        panel.add(lblTotalRow)
+        lblTotalRow.setBounds(305, 250, 295, 25); panel.add(lblTotalRow)
 
-        total.setBounds(300, 275, 300, 25)
-        panel.add(total)
+        total.setBounds(300, 275, 300, 25); panel.add(total)
 
         val lblQueryConditions = JLabel("Query Conditions:")
-        lblQueryConditions.setBounds(305, 300, 295, 25)
-        panel.add(lblQueryConditions)
+        lblQueryConditions.setBounds(305, 300, 295, 25); panel.add(lblQueryConditions)
 
-        where.lineWrap = true
-        where.wrapStyleWord = true
+        where.lineWrap = true; where.wrapStyleWord = true
         val jspWhere = JScrollPane(where)
-        jspWhere.setBounds(305, 328, 290, 119)
-        panel.add(jspWhere)
+        jspWhere.setBounds(305, 328, 290, 119); panel.add(jspWhere)
 
-        btnStart.setBounds(300, 475, 300, 25)
-        panel.add(btnStart)
+        btnStart.setBounds(300, 475, 300, 25); panel.add(btnStart)
         // End
 
         // Set Block 4 (StatusBox)
-        statusBox.isEditable = false
-        statusBox.lineWrap = true
-        statusBox.wrapStyleWord = true
+        statusBox.isEditable = false; statusBox.lineWrap = true; statusBox.wrapStyleWord = true
         val jspStatusBox = JScrollPane(statusBox)
-        jspStatusBox.setBounds(5, 503, 590, 164)
-        panel.add(jspStatusBox)
+        jspStatusBox.setBounds(5, 503, 590, 164); panel.add(jspStatusBox)
         // End
 
         window.isVisible = true
@@ -282,35 +225,33 @@ class Window {
         rdBtnFromDbTypeOne.isEnabled = false
         rdBtnFromDbTypeTwo.isEnabled = false
         rdBtnFromDbTypeThree.isEnabled = false
-        rdBtnToDbTypeOne.isEnabled = false
-        rdBtnToDbTypeTwo.isEnabled = false
-        rdBtnToDbTypeThree.isEnabled = false
-        rdBtnFuncOne.isEnabled = false
-        rdBtnFuncTwo.isEnabled = false
-        rdBtnModeOne.isEnabled = false
-        rdBtnModeTwo.isEnabled = false
+
+        rdBtnToDbTypeOne.isEnabled = false; rdBtnToDbTypeTwo.isEnabled = false; rdBtnToDbTypeThree.isEnabled = false
+
+        rdBtnFuncOne.isEnabled = false; rdBtnFuncTwo.isEnabled = false
+
+        rdBtnModeOne.isEnabled = false; rdBtnModeTwo.isEnabled = false
+
         chBoxSetIdInsert.isEnabled = false
-        btnAddTabName.isEnabled = false
-        btnRemoveTabName.isEnabled = false
-        btnClearTabName.isEnabled = false
+
+        btnAddTabName.isEnabled = false; btnRemoveTabName.isEnabled = false; btnClearTabName.isEnabled = false
+
         btnStart.isEnabled = false
     }
 
     fun end() {
-        rdBtnFromDbTypeOne.isEnabled = true
-        rdBtnFromDbTypeTwo.isEnabled = true
-        rdBtnFromDbTypeThree.isEnabled = true
-        rdBtnToDbTypeOne.isEnabled = true
-        rdBtnToDbTypeTwo.isEnabled = true
-        rdBtnToDbTypeThree.isEnabled = true
-        rdBtnFuncOne.isEnabled = true
-        rdBtnFuncTwo.isEnabled = true
-        rdBtnModeOne.isEnabled = true
-        rdBtnModeTwo.isEnabled = true
+        rdBtnFromDbTypeOne.isEnabled = true; rdBtnFromDbTypeTwo.isEnabled = true; rdBtnFromDbTypeThree.isEnabled = true
+
+        rdBtnToDbTypeOne.isEnabled = true; rdBtnToDbTypeTwo.isEnabled = true; rdBtnToDbTypeThree.isEnabled = true
+
+        rdBtnFuncOne.isEnabled = true; rdBtnFuncTwo.isEnabled = true
+
+        rdBtnModeOne.isEnabled = true; rdBtnModeTwo.isEnabled = true
+
         chBoxSetIdInsert.isEnabled = true
-        btnAddTabName.isEnabled = true
-        btnRemoveTabName.isEnabled = true
-        btnClearTabName.isEnabled = true
+
+        btnAddTabName.isEnabled = true; btnRemoveTabName.isEnabled = true; btnClearTabName.isEnabled = true
+
         btnStart.isEnabled = true
     }
 
@@ -321,18 +262,21 @@ class Window {
                 // From DB Type Change
                 "from Oracle DB" -> {
                     fromDbType = 1
+
                     rdBtnFromDbTypeOne.isSelected = true
                     rdBtnFromDbTypeTwo.isSelected = false
                     rdBtnFromDbTypeThree.isSelected = false
                 }
                 "from SQL Server" -> {
                     fromDbType = 2
+
                     rdBtnFromDbTypeOne.isSelected = false
                     rdBtnFromDbTypeTwo.isSelected = true
                     rdBtnFromDbTypeThree.isSelected = false
                 }
                 "from MySQL" -> {
                     fromDbType = 3
+
                     rdBtnFromDbTypeOne.isSelected = false
                     rdBtnFromDbTypeTwo.isSelected = false
                     rdBtnFromDbTypeThree.isSelected = true
@@ -342,56 +286,60 @@ class Window {
                 // To DB Type Change
                 "to Oracle DB" -> {
                     toDbType = 1
+
                     rdBtnToDbTypeOne.isSelected = true
                     rdBtnToDbTypeTwo.isSelected = false
                     rdBtnToDbTypeThree.isSelected = false
 
-                    idInsert = false
-                    chBoxSetIdInsert.isEnabled = false
+                    idInsert = false; chBoxSetIdInsert.isEnabled = false
                 }
                 "to SQL Server" -> {
                     toDbType = 2
+
                     rdBtnToDbTypeOne.isSelected = false
                     rdBtnToDbTypeTwo.isSelected = true
                     rdBtnToDbTypeThree.isSelected = false
 
-                    idInsert = chBoxSetIdInsert.isSelected
-                    chBoxSetIdInsert.isEnabled = true
+                    idInsert = chBoxSetIdInsert.isSelected; chBoxSetIdInsert.isEnabled = true
                 }
                 "to MySQL" -> {
                     toDbType = 3
+
                     rdBtnToDbTypeOne.isSelected = false
                     rdBtnToDbTypeTwo.isSelected = false
                     rdBtnToDbTypeThree.isSelected = true
 
-                    idInsert = false
-                    chBoxSetIdInsert.isEnabled = false
+                    idInsert = false; chBoxSetIdInsert.isEnabled = false
                 }
                 // End
 
                 // Function Mode Change
                 "Transfer" -> {
                     func = 1
-                    rdBtnFuncOne.isSelected = true
-                    rdBtnFuncTwo.isSelected = false
+
+                    rdBtnFuncOne.isSelected = true; rdBtnFuncTwo.isSelected = false; rdBtnFuncThree.isSelected = false
                 }
                 "Compare" -> {
                     func = 2
-                    rdBtnFuncOne.isSelected = false
-                    rdBtnFuncTwo.isSelected = true
+
+                    rdBtnFuncOne.isSelected = false; rdBtnFuncTwo.isSelected = true; rdBtnFuncThree.isSelected = false
+                }
+                "Synchronize" -> {
+                    func = 3
+
+                    rdBtnFuncOne.isSelected = false; rdBtnFuncTwo.isSelected = false; rdBtnFuncThree.isSelected = true
                 }
                 // End
 
                 // Transfer Mode Change
                 "To File" -> {
                     mode = 1
-                    rdBtnModeOne.isSelected = true
-                    rdBtnModeTwo.isSelected = false
+
+                    rdBtnModeOne.isSelected = true; rdBtnModeTwo.isSelected = false
                 }
                 "To DB" -> {
                     mode = 2
-                    rdBtnModeOne.isSelected = false
-                    rdBtnModeTwo.isSelected = true
+                    rdBtnModeOne.isSelected = false; rdBtnModeTwo.isSelected = true
                 }
                 // End
 

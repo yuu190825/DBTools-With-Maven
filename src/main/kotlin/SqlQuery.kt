@@ -51,14 +51,14 @@ class SqlQuery {
         }
     }
 
-    fun getSelectAllQuery(type: Byte, tabName: String, where: String, id: String, from: Int, to: Int): String {
+    fun getSelectAllQuery(type: Byte, tabName: String, where: String, idColName: String, from: Int, to: Int): String {
         return when (type) {
             1.toByte() -> "$SELECT_IN_ORACLE_DB $tabName T $where) $SELECT_ALL_FROM_IN_ORACLE_DB $from " +
-                    "$SELECT_ALL_TO_IN_ORACLE_DB $to $SELECT_ALL_ORDER_BY_IN_ORACLE_DB $id"
-            2.toByte() -> "$SELECT_ALL_ORDER_BY_IN_SQL_SERVER $id) $SELECT_ALL_IN_SQL_SERVER $tabName $where) " +
+                    "$SELECT_ALL_TO_IN_ORACLE_DB $to $SELECT_ALL_ORDER_BY_IN_ORACLE_DB $idColName"
+            2.toByte() -> "$SELECT_ALL_ORDER_BY_IN_SQL_SERVER $idColName) $SELECT_ALL_IN_SQL_SERVER $tabName $where) " +
                     "$SELECT_ALL_FROM_IN_SQL_SERVER $from $SELECT_ALL_TO_IN_SQL_SERVER $to"
-            else -> "$SELECT_IN_MYSQL $tabName $where $SELECT_ALL_ORDER_BY_IN_MYSQL $id $SELECT_ALL_LIMIT_IN_MYSQL " +
-                    "$from,$to"
+            else -> "$SELECT_IN_MYSQL $tabName $where $SELECT_ALL_ORDER_BY_IN_MYSQL $idColName" +
+                    "$SELECT_ALL_LIMIT_IN_MYSQL $from, $to"
         }
     }
 }

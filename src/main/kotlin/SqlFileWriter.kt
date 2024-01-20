@@ -18,8 +18,11 @@ class SqlFileWriter(
         var bw: BufferedWriter? = null
 
         try {
-            bw = if (fileNumber > 0) BufferedWriter(FileWriter("${tabName}_${from}_${to}_$fileNumber.sql"))
-            else BufferedWriter(FileWriter("${tabName}_error.sql"))
+            bw = if (fileNumber >= 0) BufferedWriter(FileWriter("${tabName}_${from}_${to}_$fileNumber.sql"))
+            else {
+                if (from >= 0 && to >= 0) BufferedWriter(FileWriter("${tabName}_${from}_${to}_error.sql"))
+                else BufferedWriter(FileWriter("${tabName}_error.sql"))
+            }
 
             if (idInsert) bw.write("SET IDENTITY_INSERT $tabName ON;\n")
 
@@ -27,6 +30,7 @@ class SqlFileWriter(
 
             if (idInsert) bw.write("SET IDENTITY_INSERT $tabName OFF;")
         } catch (ioe: IOException) { error = true } finally {
-            try { bw?.close() } catch (ioe: IOException) { error = true } }
+            try { bw?.close() } catch (ioe: IOException) { error = true }
+        }
     }
 }
