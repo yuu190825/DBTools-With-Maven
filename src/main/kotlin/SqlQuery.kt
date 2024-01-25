@@ -57,7 +57,7 @@ class SqlQuery {
                     "$SELECT_ALL_TO_IN_ORACLE_DB $to $SELECT_ALL_ORDER_BY_IN_ORACLE_DB $idColName"
             2.toByte() -> "$SELECT_ALL_ORDER_BY_IN_SQL_SERVER $idColName) $SELECT_ALL_IN_SQL_SERVER $tabName $where) " +
                     "$SELECT_ALL_FROM_IN_SQL_SERVER $from $SELECT_ALL_TO_IN_SQL_SERVER $to"
-            else -> "$SELECT_IN_MYSQL $tabName $where $SELECT_ALL_ORDER_BY_IN_MYSQL $idColName" +
+            else -> "$SELECT_IN_MYSQL $tabName $where $SELECT_ALL_ORDER_BY_IN_MYSQL $idColName " +
                     "$SELECT_ALL_LIMIT_IN_MYSQL $from, $to"
         }
     }

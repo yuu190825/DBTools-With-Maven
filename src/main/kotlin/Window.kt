@@ -3,6 +3,7 @@ package com.itoria.dbtools
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import javax.swing.*
+import javax.swing.text.DefaultCaret
 
 class Window {
 
@@ -214,6 +215,8 @@ class Window {
 
         // Set Block 4 (StatusBox)
         statusBox.isEditable = false; statusBox.lineWrap = true; statusBox.wrapStyleWord = true
+        val dcStatusBox = statusBox.caret as DefaultCaret
+        dcStatusBox.updatePolicy = DefaultCaret.ALWAYS_UPDATE
         val jspStatusBox = JScrollPane(statusBox)
         jspStatusBox.setBounds(5, 503, 590, 164); panel.add(jspStatusBox)
         // End
