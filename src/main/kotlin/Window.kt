@@ -342,6 +342,7 @@ class Window {
                 }
                 "To DB" -> {
                     mode = 2
+
                     rdBtnModeOne.isSelected = false; rdBtnModeTwo.isSelected = true
                 }
                 // End

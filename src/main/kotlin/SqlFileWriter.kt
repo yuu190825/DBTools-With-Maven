@@ -3,6 +3,7 @@ package com.itoria.dbtools
 import java.io.BufferedWriter
 import java.io.FileWriter
 import java.io.IOException
+import javax.swing.JTextArea
 
 class SqlFileWriter(
     private val tabName: String,
@@ -10,7 +11,8 @@ class SqlFileWriter(
     private val to: Int,
     private val fileNumber: Int,
     private val idInsert: Boolean,
-    private val sqlStringList: MutableList<String>
+    private val sqlStringList: MutableList<String>,
+    private val statusBox: JTextArea
 ): Thread() {
     var error = false
 
@@ -29,8 +31,8 @@ class SqlFileWriter(
             for (sqlString in sqlStringList) bw.write("$sqlString\n")
 
             if (idInsert) bw.write("SET IDENTITY_INSERT $tabName OFF;")
-        } catch (ioe: IOException) { error = true } finally {
-            try { bw?.close() } catch (ioe: IOException) { error = true }
+        } catch (ioe: IOException) { statusBox.append("IO Error!!!\n"); error = true } finally {
+            try { bw?.close() } catch (ioe: IOException) { statusBox.append("IO Error!!!\n"); error = true }
         }
     }
 }

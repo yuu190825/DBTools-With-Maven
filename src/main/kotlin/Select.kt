@@ -79,11 +79,13 @@ class Select(
                 for (colName in colNameList) {
                     if (func == 1.toByte()) {
                         try { colValueList.add(rs.getTimestamp(colName)) } catch (e: Exception) {
-                            colValueList.add(rs.getString(colName).replace("'", "''")) } // '
+                            colValueList.add(rs.getString(colName).replace("'", "''")) // '
+                        }
                     } else {
                         if (rs.getObject(colName) == null) colValueList.add("NULL") else {
                             try { colValueList.add(rs.getTimestamp(colName)) } catch (e: Exception) {
-                                colValueList.add(rs.getString(colName)) }
+                                colValueList.add(rs.getString(colName))
+                            }
                         }
                     }
                 }
@@ -98,8 +100,12 @@ class Select(
             if (func == 1.toByte() && colValueLists.isNotEmpty()) colValuePackages.add(colValueLists)
             // End
 
-        } catch (e: Exception) { error = true } finally {
-            try { rs?.close(); stmt?.close(); conn?.close() } catch (sqe: SQLException) { error = true }
+        } catch (cne: ClassNotFoundException) { statusBox.append("Class Error!!!\n"); error = true }
+        catch (sqe: SQLException) { statusBox.append("SQL Error!!!\n"); error = true }
+        finally {
+            try { rs?.close(); stmt?.close(); conn?.close() } catch (sqe: SQLException) {
+                statusBox.append("SQL Error!!!\n"); error = true
+            }
         }
     }
 }

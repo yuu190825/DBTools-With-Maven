@@ -52,11 +52,15 @@ class Execute(
         selectA.start(); if (func != 1.toByte()) selectB.start()
 
         if (func == 1.toByte()) {
-            try { selectA.join() } catch (ie: InterruptedException) { error = true }
+            try { selectA.join() } catch (ie: InterruptedException) {
+                statusBox.append("Thread Error!!!\n"); error = true
+            }
 
             error = selectA.error
         } else {
-            try { selectA.join(); selectB.join() } catch (ie: InterruptedException) { error = true }
+            try { selectA.join(); selectB.join() } catch (ie: InterruptedException) {
+                statusBox.append("Thread Error!!!\n"); error = true
+            }
 
             error = selectA.error || selectB.error
         }
@@ -71,7 +75,9 @@ class Execute(
                 for (sqlStringCreate in sqlStringCreateList) sqlStringCreate.start()
 
                 for (sqlStringCreate in sqlStringCreateList) {
-                    try { sqlStringCreate.join() } catch (ie: InterruptedException) { error = true }
+                    try { sqlStringCreate.join() } catch (ie: InterruptedException) {
+                        statusBox.append("Thread Error!!!\n"); error = true
+                    }
 
                     sqlStringPackages.add(sqlStringCreate.sqlStringList)
                 }
@@ -80,6 +86,8 @@ class Execute(
                     if (mode == 2.toByte()) {
                         var conn: Connection? = null
                         var stmt: Statement? = null
+
+                        statusBox.append("Doing TRUNCATE TABLE...\n")
 
                         try {
                             Class.forName(DbConfig().getJdbcDriver(toDbType))
@@ -90,8 +98,12 @@ class Execute(
                             stmt = conn?.createStatement()
 
                             stmt?.executeUpdate("TRUNCATE TABLE $tabName")
-                        } catch (e: Exception) {error = true} finally {
-                            try { stmt?.close(); conn?.close() } catch (sqe: SQLException) { error = true }
+                        } catch (cne: ClassNotFoundException) { statusBox.append("Class Error!!!\n"); error = true }
+                        catch (sqe: SQLException) { statusBox.append("SQL Error!!!\n"); error = true }
+                        finally {
+                            try { stmt?.close(); conn?.close() } catch (sqe: SQLException) {
+                                statusBox.append("SQL Error!!!\n"); error = true
+                            }
                         }
 
                         if (!error) {
@@ -99,13 +111,15 @@ class Execute(
 
                             for (sqlStringListPackage in sqlStringPackages) insertIntoList.add(
                                 InsertInto(toDbType, toDbUrl, toDbSid, toDbName, toDbUser, toDbPass,
-                                    sqlStringListPackage)
+                                    sqlStringListPackage, statusBox)
                             )
 
                             for (insertInto in insertIntoList) insertInto.start()
 
                             for (insertInto in insertIntoList) {
-                                try { insertInto.join() } catch (ie: InterruptedException) { error = true }
+                                try { insertInto.join() } catch (ie: InterruptedException) {
+                                    statusBox.append("Thread Error!!!\n"); error = true
+                                }
 
                                 warning += insertInto.warning; if (!error) error = insertInto.error
                                 errorSqlStringList.addAll(insertInto.sqlStringListOut)
@@ -113,6 +127,8 @@ class Execute(
                         }
 
                         if (!error && idInsert) {
+                            statusBox.append("Doing SET IDENTITY_INSERT OFF...\n")
+
                             try {
                                 Class.forName(DbConfig().getJdbcDriver(toDbType))
                                 conn = DriverManager.getConnection(DbConfig().getDbUrl(toDbType, toDbUrl, toDbName),
@@ -120,8 +136,12 @@ class Execute(
                                 stmt = conn?.createStatement()
 
                                 stmt?.executeUpdate("SET IDENTITY_INSERT $tabName OFF")
-                            } catch (e: Exception) {error = true} finally {
-                                try { stmt?.close(); conn?.close() } catch (sqe: SQLException) { error = true }
+                            } catch (cne: ClassNotFoundException) { statusBox.append("Class Error!!!\n"); error = true }
+                            catch (sqe: SQLException) { statusBox.append("SQL Error!!!\n"); error = true }
+                            finally {
+                                try { stmt?.close(); conn?.close() } catch (sqe: SQLException) {
+                                    statusBox.append("SQL Error!!!\n"); error = true
+                                }
                             }
                         }
 
@@ -129,9 +149,11 @@ class Execute(
                             statusBox.append("Running SqlFileWriter...\n")
 
                             val sqlFileWriter = SqlFileWriter(tabName, from, to, -1, idInsert,
-                                errorSqlStringList); sqlFileWriter.start()
+                                errorSqlStringList, statusBox); sqlFileWriter.start()
 
-                            try { sqlFileWriter.join() } catch (ie: InterruptedException) { error = true }
+                            try { sqlFileWriter.join() } catch (ie: InterruptedException) {
+                                statusBox.append("Thread Error!!!\n"); error = true
+                            }
 
                             if (!error) error = sqlFileWriter.error
                         }
@@ -139,12 +161,15 @@ class Execute(
                         statusBox.append("Running SqlFileWriter...\n")
 
                         for (i in 0 until sqlStringPackages.size) sqlFileWriterList.add(
-                            SqlFileWriter(tabName, from, to, i + 1, idInsert, sqlStringPackages[i]))
+                            SqlFileWriter(tabName, from, to, i + 1, idInsert, sqlStringPackages[i], statusBox)
+                        )
 
                         for (sqlFileWriter in sqlFileWriterList) sqlFileWriter.start()
 
                         for (sqlFileWriter in sqlFileWriterList) {
-                            try { sqlFileWriter.join() } catch (ie: InterruptedException) { error = true }
+                            try { sqlFileWriter.join() } catch (ie: InterruptedException) {
+                                statusBox.append("Thread Error!!!\n"); error = true
+                            }
 
                             if (!error) error = sqlFileWriter.error
                         }

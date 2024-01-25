@@ -3,13 +3,15 @@ package com.itoria.dbtools
 import java.io.BufferedWriter
 import java.io.FileWriter
 import java.io.IOException
+import javax.swing.JTextArea
 
 class CsvFileWriter(
     private val dbName: String,
     private val tabName: String,
     private val notInDBA: MutableList<MutableList<Any?>>,
     private val addInDBA: MutableList<MutableList<Any?>>,
-    private val xorInDBA: MutableList<MutableList<Any?>>
+    private val xorInDBA: MutableList<MutableList<Any?>>,
+    private val statusBox: JTextArea
 ) {
     var error = false
 
@@ -48,8 +50,8 @@ class CsvFileWriter(
 
                 bw.newLine()
             }
-        } catch (ioe: IOException) { error = true } finally {
-            try { bw?.close() } catch (ioe: IOException) { error = true }
+        } catch (ioe: IOException) { statusBox.append("IO Error!!!\n"); error = true } finally {
+            try { bw?.close() } catch (ioe: IOException) { statusBox.append("IO Error!!!\n"); error = true }
         }
     }
 }

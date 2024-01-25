@@ -69,7 +69,7 @@ private class StartButton {
                             window.statusBox.append("Running CsvFileWriter...\n")
 
                             val csvFileWriter = CsvFileWriter(window.fromDbName.text, tabName, compare.notInDBA,
-                                compare.addInDBA, compare.xorInDBA); csvFileWriter.start()
+                                compare.addInDBA, compare.xorInDBA, window.statusBox); csvFileWriter.start()
 
                             error = csvFileWriter.error
                         } else {
@@ -79,19 +79,20 @@ private class StartButton {
 
                             for (colValueList in compare.notInDBA) {
                                 try { val id = colValueList[0].toString().toInt(); toDeleteIdList.add(id.toString()) }
-                                catch (e: Exception) { toDeleteIdList.add("'${colValueList[0]}'") }
+                                catch (nfe: NumberFormatException) { toDeleteIdList.add("'${colValueList[0]}'") }
                             }
 
                             for (colValueList in compare.xorInDBA) {
                                 try { val id = colValueList[0].toString().toInt(); toDeleteIdList.add(id.toString()) }
-                                catch (e: Exception) { toDeleteIdList.add("'${colValueList[0]}'") }
+                                catch (nfe: NumberFormatException) { toDeleteIdList.add("'${colValueList[0]}'") }
                             }
 
                             window.statusBox.append("Running Delete...\n")
 
                             val delete = Delete(window.toDbType, window.toDbUrl.text, window.toDbSid.text,
                                 window.toDbName.text, window.toDbUser.text, String(window.toDbPass.password),
-                                tabName, colNameList.elementAt(0), toDeleteIdList); delete.start()
+                                tabName, colNameList.elementAt(0), toDeleteIdList, window.statusBox)
+                            delete.start()
 
                             error = delete.error
 
@@ -106,7 +107,9 @@ private class StartButton {
                                 sqlStringCreateAdd.start(); sqlStringCreateXor.start()
 
                                 try { sqlStringCreateAdd.join(); sqlStringCreateXor.join() }
-                                catch (ie: InterruptedException) { error = true }
+                                catch (ie: InterruptedException) {
+                                    window.statusBox.append("Thread Error!!!\n"); error = true
+                                }
 
                                 toInsertSqlStringList.addAll(sqlStringCreateAdd.sqlStringList)
                                 toInsertSqlStringList.addAll(sqlStringCreateXor.sqlStringList)
@@ -117,9 +120,12 @@ private class StartButton {
 
                                 val insertInto = InsertInto(window.toDbType, window.toDbUrl.text,
                                     window.toDbSid.text, window.toDbName.text, window.toDbUser.text,
-                                    String(window.toDbPass.password), toInsertSqlStringList); insertInto.start()
+                                    String(window.toDbPass.password), toInsertSqlStringList, window.statusBox)
+                                insertInto.start()
 
-                                try { insertInto.join() } catch (ie: InterruptedException) { error = true }
+                                try { insertInto.join() } catch (ie: InterruptedException) {
+                                    window.statusBox.append("Thread Error!!!\n"); error = true
+                                }
 
                                 warning += insertInto.warning; if (!error) error = insertInto.error
                                 errorSqlStringList.addAll(insertInto.sqlStringListOut)
@@ -129,9 +135,11 @@ private class StartButton {
                                 window.statusBox.append("Running SqlFileWriter...\n")
 
                                 val sqlFileWriter = SqlFileWriter(tabName, -1, -1, -1,
-                                    window.idInsert, errorSqlStringList); sqlFileWriter.start()
+                                    window.idInsert, errorSqlStringList, window.statusBox); sqlFileWriter.start()
 
-                                try { sqlFileWriter.join() } catch (ie: InterruptedException) { error = true }
+                                try { sqlFileWriter.join() } catch (ie: InterruptedException) {
+                                    window.statusBox.append("Thread Error!!!\n"); error = true
+                                }
 
                                 if (!error) error = sqlFileWriter.error
                             }
