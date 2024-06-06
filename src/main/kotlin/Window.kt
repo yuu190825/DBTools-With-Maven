@@ -62,7 +62,7 @@ class Window {
         panel.layout = null; window.contentPane = panel
         // End
 
-        // Set Block 1 (To DB Setter)
+        // Set Block 1 (From DB Setter)
         val lblFromDbType = JLabel("From DB Type:")
         lblFromDbType.setBounds(5, 0, 295, 25); panel.add(lblFromDbType)
 
