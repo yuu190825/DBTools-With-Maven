@@ -7,14 +7,8 @@ import java.sql.Statement
 import javax.swing.JTextArea
 
 class Delete(
-    private val dbType: Byte,
-    private val dbUrl: String,
-    private val dbSid: String,
-    private val dbName: String,
-    private val dbUser: String,
-    private val dbPass: String,
-    private val tabName: String,
-    private val idColName: String,
+    private val deleteSet: MutableMap<String, Any>,
+    private val dbSet: MutableMap<String, Any>,
     private val toDeleteIdList: MutableList<String>,
     private val statusBox: JTextArea
 ) {
@@ -24,26 +18,41 @@ class Delete(
         var conn: Connection? = null
         var stmt: Statement? = null
 
+        // Get Value from Set Map
+        val tableName = deleteSet["TABLE_NAME"] as String
+        val idColName = deleteSet["ID_COL_NAME"] as String
+
+        val dbType = dbSet["DB_TYPE"] as Int
+        val dbUrl = dbSet["DB_URL"] as String
+        val dbSid = dbSet["DB_SID"] as String
+        val dbName = dbSet["DB_NAME"] as String
+        val dbUser = dbSet["DB_USER"] as String
+        val dbPass = dbSet["DB_PASS"] as String
+        // End
+
         try {
             Class.forName(DbConfig().getJdbcDriver(dbType))
-            conn = if (dbType == 1.toByte()) DriverManager.getConnection(
-                DbConfig().getDbUrl(dbType, dbUrl, dbSid), dbUser, dbPass)
-            else DriverManager.getConnection(DbConfig().getDbUrl(dbType, dbUrl, dbName), dbUser, dbPass)
+            conn = if (dbType == 1) {
+                DriverManager.getConnection(
+                    DbConfig().getDbUrl(dbType, dbUrl, dbSid), dbUser, dbPass
+                )
+            } else
+                DriverManager.getConnection(DbConfig().getDbUrl(dbType, dbUrl, dbName), dbUser, dbPass)
             stmt = conn?.createStatement()
-        } catch (cne: ClassNotFoundException) { statusBox.append("Class Error!!!\n"); error = true }
-        catch (sqe: SQLException) { statusBox.append("SQL Error!!!\n"); error = true }
+        }
+        catch (_: ClassNotFoundException) { statusBox.append("Class Error!!!\n"); error = true }
+        catch (_: SQLException) { statusBox.append("SQL Error!!!\n"); error = true }
 
         if (!error) {
-            for (id in toDeleteIdList) { // DELETE
-                try { stmt?.executeUpdate("DELETE FROM $tabName WHERE $idColName = $id") }
-                catch (sqe: SQLException) { statusBox.append("SQL Error!!!\n"); error = true }
+            for (id in toDeleteIdList) {
+                try { stmt?.executeUpdate("DELETE FROM $tableName WHERE $idColName = $id") } // DELETE
+                catch (_: SQLException) { statusBox.append("SQL Error!!!\n"); error = true }
             }
         }
 
         if (!error) {
-            try { stmt?.close(); conn?.close() } catch (sqe: SQLException) {
-                statusBox.append("SQL Error!!!\n"); error = true
-            }
+            try { stmt?.close(); conn?.close() }
+            catch (_: SQLException) { statusBox.append("SQL Error!!!\n"); error = true }
         }
     }
 }

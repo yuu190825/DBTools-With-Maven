@@ -1,22 +1,28 @@
 package com.itoria.dbtools
 
-class SqlStringCreate(
-    private val tabName: String,
-    private val idInsert: Boolean,
+class SqlStringCreator(
+    private val createSet: MutableMap<String, Any>,
     private val colNameList: MutableSet<String>,
-    private val colValueLists: MutableList<MutableList<Any?>>,
-    private val isSync: Boolean
+    private val colValueLists: MutableList<MutableList<Any?>>
 ): Thread() {
     val sqlStringList = mutableListOf<String>()
 
     override fun run() {
-        for (colValueList in colValueLists) {
-            if (isSync) for (i in 0 until colValueList.size) colValueList[i] = colValueList[i].toString()
-                .replace("'", "''")
 
-            val sqlString = if (idInsert) StringBuilder("SET IDENTITY_INSERT $tabName ON; INSERT INTO $tabName(" +
-                    colNameList.elementAt(0))
-            else StringBuilder("INSERT INTO $tabName(${colNameList.elementAt(0)}")
+        // Get Value from Set Map
+        val tableName = createSet["TABLE_NAME"] as String
+        val isIdInsert = createSet["IS_ID_INSERT"] as Boolean
+        val isSync = createSet["IS_SYNC"] as Boolean
+        // End
+
+        for (colValueList in colValueLists) {
+            if (isSync)
+                for (i in 0 until colValueList.size)
+                    colValueList[i] = colValueList[i].toString().replace("'", "''")
+
+            val sqlString = if (isIdInsert) StringBuilder("SET IDENTITY_INSERT $tableName ON; " +
+                    "INSERT INTO $tableName(${colNameList.elementAt(0)}")
+            else StringBuilder("INSERT INTO $tableName(${colNameList.elementAt(0)}")
 
             for (i in 1 until colNameList.size) sqlString.append(", ${colNameList.elementAt(i)}")
 
@@ -41,11 +47,9 @@ class SqlStringCreate(
             sqlStringList.add(sqlString.append(");").toString())
         }
 
-        // DateTime
+        // DateTime Replace
         for (i in 0 until sqlStringList.size) sqlStringList[i] = sqlStringList[i].replace(
             "[0-9]{5}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{1,3}".toRegex(),
             "1900-01-01 00:00:00.0")
-        // End
-
     }
 }

@@ -7,42 +7,48 @@ import java.sql.Statement
 import javax.swing.JTextArea
 
 class InsertInto(
-    private val dbType: Byte,
-    private val dbUrl: String,
-    private val dbSid: String,
-    private val dbName: String,
-    private val dbUser: String,
-    private val dbPass: String,
-    private val sqlStringListIn: MutableList<String>,
+    private val dbSet: MutableMap<String, Any>,
+    private val sqlStringList: MutableList<String>,
     private val statusBox: JTextArea
 ): Thread() {
-    var warning: Short = 0
-    val sqlStringListOut = mutableListOf<String>()
+    var warning = 0
+    val errorSqlStringList = mutableListOf<String>()
     var error = false
 
     override fun run() {
         var conn: Connection? = null
         var stmt: Statement? = null
 
+        // Get Value from Set Map
+        val dbType = dbSet["DB_TYPE"] as Int
+        val dbUrl = dbSet["DB_URL"] as String
+        val dbSid = dbSet["DB_SID"] as String
+        val dbName = dbSet["DB_NAME"] as String
+        val dbUser = dbSet["DB_USER"] as String
+        val dbPass = dbSet["DB_PASS"] as String
+        // End
+
         try {
             Class.forName(DbConfig().getJdbcDriver(dbType))
-            conn = if (dbType == 1.toByte()) DriverManager.getConnection(
-                DbConfig().getDbUrl(dbType, dbUrl, dbSid), dbUser, dbPass)
-            else DriverManager.getConnection(DbConfig().getDbUrl(dbType, dbUrl, dbName), dbUser, dbPass)
+            conn = if (dbType == 1) {
+                DriverManager.getConnection(
+                    DbConfig().getDbUrl(dbType, dbUrl, dbSid), dbUser, dbPass
+                )
+            } else
+                DriverManager.getConnection(DbConfig().getDbUrl(dbType, dbUrl, dbName), dbUser, dbPass)
             stmt = conn?.createStatement()
-        } catch (cne: ClassNotFoundException) { statusBox.append("Class Error!!!\n"); error = true }
-        catch (sqe: SQLException) { statusBox.append("SQL Error!!!\n"); error = true }
+        }
+        catch (_: ClassNotFoundException) { statusBox.append("Class Error!!!\n"); error = true }
+        catch (_: SQLException) { statusBox.append("SQL Error!!!\n"); error = true }
 
         if (!error) {
-            for (sqlString in sqlStringListIn) {
-                try { stmt?.executeUpdate(sqlString) } catch (sqe: SQLException) { // INSERT INTO
-                    warning++; sqlStringListOut.add(sqlString)
-                }
+            for (sqlString in sqlStringList) {
+                try { stmt?.executeUpdate(sqlString) } // INSERT INTO
+                catch (_: SQLException) { warning++; errorSqlStringList.add(sqlString) }
             }
 
-            try { stmt?.close(); conn?.close() } catch (sqe: SQLException) {
-                statusBox.append("SQL Error!!!\n"); error = true
-            }
+            try { stmt?.close(); conn?.close() }
+            catch (_: SQLException) { statusBox.append("SQL Error!!!\n"); error = true }
         }
     }
 }

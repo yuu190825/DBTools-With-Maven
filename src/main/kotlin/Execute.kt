@@ -7,83 +7,106 @@ import java.sql.Statement
 import javax.swing.JTextArea
 
 class Execute(
-    private val fromDbType: Byte,
-    private val fromDbUrl: String,
-    private val fromDbSid: String,
-    private val fromDbName: String,
-    private val fromDbUser: String,
-    private val fromDbPass: String,
-    private val toDbType: Byte,
-    private val toDbUrl: String,
-    private val toDbSid: String,
-    private val toDbName: String,
-    private val toDbUser: String,
-    private val toDbPass: String,
-    private val func: Byte,
-    private val mode: Byte,
-    private val idInsert: Boolean,
-    private val record: Short,
-    private val tabName: String,
-    private val where: String,
+    executeSet: MutableMap<String, Any>,
     private val from: Int,
     private val to: Int,
+    private val fromDbSet: MutableMap<String, Any>,
+    private val toDbSet: MutableMap<String, Any>,
     private val statusBox: JTextArea
 ) {
     val colNameList = mutableSetOf<String>()
-    val colValueListsA = mutableListOf<MutableList<Any?>>()
-    val colValueListsB = mutableListOf<MutableList<Any?>>()
+    val dbAColValueLists = mutableListOf<MutableList<Any?>>()
+    val dbBColValueLists = mutableListOf<MutableList<Any?>>()
     var warning = 0
     private val errorSqlStringList = mutableListOf<String>()
     var error = false
 
-    init { statusBox.append("$tabName from $from to $to\n") }
+    // Get Value from Set Map (Execute Set)
+    private val func = executeSet["FUNC"] as Int
+    private val mode = executeSet["MODE"] as Int
+    private val isIdInsert = executeSet["IS_ID_INSERT"] as Boolean
+    private val record = executeSet["RECORD"] as Int
+    private val tableName = executeSet["TABLE_NAME"] as String
+    private val where = executeSet["WHERE"] as String
+    // End
+
+    init { statusBox.append("$tableName from $from to $to\n") }
 
     fun start() {
-        val sqlStringPackages = mutableListOf<MutableList<String>>()
-        val sqlStringCreateList = mutableListOf<SqlStringCreate>()
+        val sqlStringLists = mutableListOf<MutableList<String>>()
+        val sqlStringCreatorList = mutableListOf<SqlStringCreator>()
         val insertIntoList = mutableListOf<InsertInto>()
         val sqlFileWriterList = mutableListOf<SqlFileWriter>()
 
-        val selectA = Select(fromDbType, fromDbUrl, fromDbSid, fromDbName, fromDbUser, fromDbPass, func, record,
-            tabName, where, from, to, statusBox)
-        val selectB = Select(toDbType, toDbUrl, toDbSid, toDbName, toDbUser, toDbPass, func, record, tabName, where,
-            from, to, statusBox)
+        // Get Value from Set Map
+        val toDbType = toDbSet["DB_TYPE"] as Int
+        val toDbUrl = toDbSet["DB_URL"] as String
+        val toDbSid = toDbSet["DB_SID"] as String
+        val toDbName = toDbSet["DB_NAME"] as String
+        val toDbUser = toDbSet["DB_USER"] as String
+        val toDbPass = toDbSet["DB_PASS"] as String
+        // End
 
-        selectA.start(); if (func != 1.toByte()) selectB.start()
+        // Put Value to Set Map
+        val selectSet = mutableMapOf<String, Any>()
+        selectSet["FUNC"] = func
+        selectSet["RECORD"] = record
+        selectSet["TABLE_NAME"] = tableName
+        selectSet["WHERE"] = where
+        selectSet["FROM"] = from
+        selectSet["TO"] = to
 
-        if (func == 1.toByte()) {
-            try { selectA.join() } catch (ie: InterruptedException) {
-                statusBox.append("Thread Error!!!\n"); error = true
-            }
+        val createSet = mutableMapOf<String, Any>()
+        createSet["TABLE_NAME"] = tableName
+        createSet["IS_ID_INSERT"] = isIdInsert
+
+        val writerSet = mutableMapOf<String, Any>()
+        writerSet["TABLE_NAME"] = tableName
+        writerSet["FROM"] = from
+        writerSet["TO"] = to
+        writerSet["IS_ID_INSERT"] = isIdInsert
+        // End
+
+        val selectA = Select(selectSet, fromDbSet, statusBox)
+        val selectB = Select(selectSet, toDbSet, statusBox)
+
+        selectA.start()
+        if (func != 1) selectB.start()
+
+        if (func == 1) {
+            try { selectA.join() }
+            catch (_: InterruptedException) { statusBox.append("Thread Error!!!\n"); error = true }
 
             error = selectA.error
         } else {
-            try { selectA.join(); selectB.join() } catch (ie: InterruptedException) {
-                statusBox.append("Thread Error!!!\n"); error = true
-            }
+            try { selectA.join(); selectB.join() }
+            catch (_: InterruptedException) { statusBox.append("Thread Error!!!\n"); error = true }
 
             error = selectA.error || selectB.error
         }
 
         if (!error) {
-            if (func == 1.toByte()) {
-                statusBox.append("Running SqlStringCreate...\n")
+            if (func == 1) {
+                statusBox.append("Running SqlStringCreator...\n")
 
-                for (clValuePackage in selectA.colValuePackages) sqlStringCreateList.add(
-                    SqlStringCreate(tabName, idInsert, selectA.colNameList, clValuePackage, false))
+                // Put Value to Set Map (Create Set)
+                createSet["IS_SYNC"] = true
+                // End
 
-                for (sqlStringCreate in sqlStringCreateList) sqlStringCreate.start()
+                for (colValueLists in selectA.colValuePackage)
+                    sqlStringCreatorList.add(SqlStringCreator(createSet, selectA.colNameList, colValueLists))
 
-                for (sqlStringCreate in sqlStringCreateList) {
-                    try { sqlStringCreate.join() } catch (ie: InterruptedException) {
-                        statusBox.append("Thread Error!!!\n"); error = true
-                    }
+                for (sqlStringCreator in sqlStringCreatorList) sqlStringCreator.start()
 
-                    sqlStringPackages.add(sqlStringCreate.sqlStringList)
+                for (sqlStringCreator in sqlStringCreatorList) {
+                    try { sqlStringCreator.join() }
+                    catch (_: InterruptedException) { statusBox.append("Thread Error!!!\n"); error = true }
+
+                    sqlStringLists.add(sqlStringCreator.sqlStringList)
                 }
 
                 if (!error) {
-                    if (mode == 2.toByte()) {
+                    if (mode == 2) {
                         var conn: Connection? = null
                         var stmt: Statement? = null
 
@@ -91,93 +114,102 @@ class Execute(
 
                         try {
                             Class.forName(DbConfig().getJdbcDriver(toDbType))
-                            conn = if (toDbType == 1.toByte()) DriverManager.getConnection(
-                                DbConfig().getDbUrl(toDbType, toDbUrl, toDbSid), toDbUser, toDbPass)
-                            else DriverManager.getConnection(DbConfig().getDbUrl(toDbType, toDbUrl, toDbName), toDbUser,
-                                toDbPass)
+                            conn = if (toDbType == 1) {
+                                DriverManager.getConnection(
+                                    DbConfig().getDbUrl(toDbType, toDbUrl, toDbSid),
+                                    toDbUser, toDbPass
+                                )
+                            } else {
+                                DriverManager.getConnection(
+                                    DbConfig().getDbUrl(toDbType, toDbUrl, toDbName), toDbUser, toDbPass
+                                )
+                            }
                             stmt = conn?.createStatement()
 
-                            stmt?.executeUpdate("TRUNCATE TABLE $tabName")
-                        } catch (cne: ClassNotFoundException) { statusBox.append("Class Error!!!\n"); error = true }
-                        catch (sqe: SQLException) { statusBox.append("SQL Error!!!\n"); error = true }
+                            stmt?.executeUpdate("TRUNCATE TABLE $tableName")
+                        }
+                        catch (_: ClassNotFoundException) { statusBox.append("Class Error!!!\n"); error = true }
+                        catch (_: SQLException) { statusBox.append("SQL Error!!!\n"); error = true }
                         finally {
-                            try { stmt?.close(); conn?.close() } catch (sqe: SQLException) {
-                                statusBox.append("SQL Error!!!\n"); error = true
-                            }
+                            try { stmt?.close(); conn?.close() }
+                            catch (_: SQLException) { statusBox.append("SQL Error!!!\n"); error = true }
                         }
 
                         if (!error) {
                             statusBox.append("Running InsertInto...\n")
 
-                            for (sqlStringListPackage in sqlStringPackages) insertIntoList.add(
-                                InsertInto(toDbType, toDbUrl, toDbSid, toDbName, toDbUser, toDbPass,
-                                    sqlStringListPackage, statusBox)
-                            )
+                            for (sqlStringList in sqlStringLists)
+                                insertIntoList.add(InsertInto(toDbSet, sqlStringList, statusBox))
 
                             for (insertInto in insertIntoList) insertInto.start()
 
                             for (insertInto in insertIntoList) {
-                                try { insertInto.join() } catch (ie: InterruptedException) {
-                                    statusBox.append("Thread Error!!!\n"); error = true
-                                }
+                                try { insertInto.join() }
+                                catch (_: InterruptedException) { statusBox.append("Thread Error!!!\n"); error = true }
 
-                                warning += insertInto.warning; if (!error) error = insertInto.error
-                                errorSqlStringList.addAll(insertInto.sqlStringListOut)
+                                if (!error) {
+                                    warning += insertInto.warning
+                                    errorSqlStringList.addAll(insertInto.errorSqlStringList)
+                                    error = insertInto.error
+                                }
                             }
                         }
 
-                        if (!error && idInsert) {
+                        if (!error && isIdInsert) {
                             statusBox.append("Doing SET IDENTITY_INSERT OFF...\n")
 
                             try {
                                 Class.forName(DbConfig().getJdbcDriver(toDbType))
-                                conn = DriverManager.getConnection(DbConfig().getDbUrl(toDbType, toDbUrl, toDbName),
-                                    toDbUser, toDbPass)
+                                conn = DriverManager.getConnection(
+                                    DbConfig().getDbUrl(toDbType, toDbUrl, toDbName),
+                                    toDbUser, toDbPass
+                                )
                                 stmt = conn?.createStatement()
 
-                                stmt?.executeUpdate("SET IDENTITY_INSERT $tabName OFF")
-                            } catch (cne: ClassNotFoundException) { statusBox.append("Class Error!!!\n"); error = true }
-                            catch (sqe: SQLException) { statusBox.append("SQL Error!!!\n"); error = true }
+                                stmt?.executeUpdate("SET IDENTITY_INSERT $tableName OFF")
+                            }
+                            catch (_: ClassNotFoundException) { statusBox.append("Class Error!!!\n"); error = true }
+                            catch (_: SQLException) { statusBox.append("SQL Error!!!\n"); error = true }
                             finally {
-                                try { stmt?.close(); conn?.close() } catch (sqe: SQLException) {
-                                    statusBox.append("SQL Error!!!\n"); error = true
-                                }
+                                try { stmt?.close(); conn?.close() }
+                                catch (_: SQLException) { statusBox.append("SQL Error!!!\n"); error = true }
                             }
                         }
 
                         if (!error && warning > 0) {
                             statusBox.append("Running SqlFileWriter...\n")
 
-                            val sqlFileWriter = SqlFileWriter(tabName, from, to, -1, idInsert,
-                                errorSqlStringList, statusBox); sqlFileWriter.start()
+                            val sqlFileWriter = SqlFileWriter(writerSet, 0, errorSqlStringList, statusBox)
+                            sqlFileWriter.start()
 
-                            try { sqlFileWriter.join() } catch (ie: InterruptedException) {
-                                statusBox.append("Thread Error!!!\n"); error = true
-                            }
+                            try { sqlFileWriter.join() }
+                            catch (_: InterruptedException) { statusBox.append("Thread Error!!!\n"); error = true }
 
                             if (!error) error = sqlFileWriter.error
                         }
                     } else {
                         statusBox.append("Running SqlFileWriter...\n")
 
-                        for (i in 0 until sqlStringPackages.size) sqlFileWriterList.add(
-                            SqlFileWriter(tabName, from, to, i + 1, idInsert, sqlStringPackages[i], statusBox)
-                        )
+                        for (i in 0 until sqlStringLists.size) {
+                            sqlFileWriterList.add(
+                                SqlFileWriter(writerSet, i + 1, sqlStringLists[i], statusBox)
+                            )
+                        }
 
                         for (sqlFileWriter in sqlFileWriterList) sqlFileWriter.start()
 
                         for (sqlFileWriter in sqlFileWriterList) {
-                            try { sqlFileWriter.join() } catch (ie: InterruptedException) {
-                                statusBox.append("Thread Error!!!\n"); error = true
-                            }
+                            try { sqlFileWriter.join() }
+                            catch (_: InterruptedException) { statusBox.append("Thread Error!!!\n"); error = true }
 
                             if (!error) error = sqlFileWriter.error
                         }
                     }
                 }
             } else {
-                if (func == 3.toByte()) colNameList.addAll(selectA.colNameList)
-                colValueListsA.addAll(selectA.colValueLists); colValueListsB.addAll(selectB.colValueLists)
+                if (func == 3) colNameList.addAll(selectA.colNameList)
+                dbAColValueLists.addAll(selectA.colValueLists)
+                dbBColValueLists.addAll(selectB.colValueLists)
             }
         }
     }

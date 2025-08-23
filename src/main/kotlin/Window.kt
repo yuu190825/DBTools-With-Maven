@@ -12,12 +12,13 @@ class Window {
     private val panel = JPanel()
 
     // Set Value
-    var fromDbType: Byte = 3
-    var toDbType: Byte = 3
-    var func: Byte = 1
-    var mode: Byte = 1
-    var idInsert = false
-    val tabNameList = mutableSetOf<String>()
+    var fromDbType = 3
+    var toDbType = 3
+    var func = 1
+    var mode = 1
+    var record = 5000
+    var isIdInsert = false
+    val tableNameList = mutableSetOf<String>()
 
     // Set Value (JTextField)
     val fromDbUrl = JTextField()
@@ -30,8 +31,8 @@ class Window {
     val toDbName = JTextField()
     val toDbUser = JTextField()
     val toDbPass = JPasswordField()
-    val record = JTextField()
-    val tabName = JTextField()
+    private val tfRecord = JTextField()
+    val tableName = JTextField()
     val total = JTextField()
     val where = JTextArea()
 
@@ -182,12 +183,12 @@ class Window {
         val lblRecord = JLabel("Record:")
         lblRecord.setBounds(305, 125, 295, 25); panel.add(lblRecord)
 
-        record.setBounds(300, 150, 300, 25); panel.add(record)
+        tfRecord.setBounds(300, 150, 300, 25); panel.add(tfRecord)
 
         val lblTabName = JLabel("Table Name:")
         lblTabName.setBounds(305, 175, 295, 25); panel.add(lblTabName)
 
-        tabName.setBounds(300, 200, 300, 25); panel.add(tabName)
+        tableName.setBounds(300, 200, 300, 25); panel.add(tableName)
 
         btnAddTabName.actionCommand = "Add"; btnAddTabName.addActionListener(TabNameListControl())
         btnAddTabName.setBounds(300, 225, 100, 25); panel.add(btnAddTabName)
@@ -225,6 +226,8 @@ class Window {
     }
 
     fun start() {
+        record = try { tfRecord.text.toInt() } catch (_: NumberFormatException) { 5000 }
+
         rdBtnFromDbTypeOne.isEnabled = false
         rdBtnFromDbTypeTwo.isEnabled = false
         rdBtnFromDbTypeThree.isEnabled = false
@@ -294,7 +297,7 @@ class Window {
                     rdBtnToDbTypeTwo.isSelected = false
                     rdBtnToDbTypeThree.isSelected = false
 
-                    idInsert = false; chBoxSetIdInsert.isEnabled = false
+                    isIdInsert = false; chBoxSetIdInsert.isEnabled = false
                 }
                 "to SQL Server" -> {
                     toDbType = 2
@@ -303,7 +306,7 @@ class Window {
                     rdBtnToDbTypeTwo.isSelected = true
                     rdBtnToDbTypeThree.isSelected = false
 
-                    idInsert = chBoxSetIdInsert.isSelected; chBoxSetIdInsert.isEnabled = true
+                    isIdInsert = chBoxSetIdInsert.isSelected; chBoxSetIdInsert.isEnabled = true
                 }
                 "to MySQL" -> {
                     toDbType = 3
@@ -312,7 +315,7 @@ class Window {
                     rdBtnToDbTypeTwo.isSelected = false
                     rdBtnToDbTypeThree.isSelected = true
 
-                    idInsert = false; chBoxSetIdInsert.isEnabled = false
+                    isIdInsert = false; chBoxSetIdInsert.isEnabled = false
                 }
                 // End
 
@@ -353,19 +356,19 @@ class Window {
 
     private inner class SetIdInsert: ActionListener {
         override fun actionPerformed(e: ActionEvent?) {
-            idInsert = chBoxSetIdInsert.isSelected
+            isIdInsert = chBoxSetIdInsert.isSelected
         }
     }
 
     private inner class TabNameListControl: ActionListener {
         override fun actionPerformed(e: ActionEvent?) {
             when (e?.actionCommand) {
-                "Add" -> tabNameList.add(tabName.text)
-                "Remove" -> tabNameList.remove(tabName.text)
-                "Clear" -> tabNameList.clear()
+                "Add" -> tableNameList.add(tableName.text)
+                "Remove" -> tableNameList.remove(tableName.text)
+                "Clear" -> tableNameList.clear()
             }
 
-            statusBox.append("Table Name List: $tabNameList\n")
+            statusBox.append("Table Name List: $tableNameList\n")
         }
     }
 }

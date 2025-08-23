@@ -1,16 +1,16 @@
 package com.itoria.dbtools
 
 class Compare(
-    private val colValueListsA: MutableList<MutableList<Any?>>,
-    private val colValueListsB: MutableList<MutableList<Any?>>
+    private val dbAColValueLists: MutableList<MutableList<Any?>>,
+    private val dbBColValueLists: MutableList<MutableList<Any?>>
 ) {
-    val notInDBA = mutableListOf<MutableList<Any?>>()
-    val addInDBA = mutableListOf<MutableList<Any?>>()
-    val xorInDBA = mutableListOf<MutableList<Any?>>()
+    val notInDbAColValueLists = mutableListOf<MutableList<Any?>>()
+    val addInDbAColValueLists = mutableListOf<MutableList<Any?>>()
+    val xorInDbAColValueLists = mutableListOf<MutableList<Any?>>()
 
     fun start() {
-        val tempColValueListsA = colValueListsA.minus(colValueListsB.toSet())
-        val tempColValueListsB = colValueListsB.minus(colValueListsA.toSet())
+        val tempColValueListsA = dbAColValueLists.minus(dbBColValueLists.toSet())
+        val tempColValueListsB = dbBColValueLists.minus(dbAColValueLists.toSet())
 
         val idInTempColValueListsA = mutableListOf<Any?>()
         for (colValueList in tempColValueListsA) idInTempColValueListsA.add(colValueList[0])
@@ -19,10 +19,10 @@ class Compare(
         for (colValueList in tempColValueListsB) idInTempColValueListsB.add(colValueList[0])
 
         for (colValueList in tempColValueListsB)
-            if (!idInTempColValueListsA.contains(colValueList[0])) notInDBA.add(colValueList)
+            if (!idInTempColValueListsA.contains(colValueList[0])) notInDbAColValueLists.add(colValueList)
 
         for (colValueList in tempColValueListsA)
-            if (!idInTempColValueListsB.contains(colValueList[0])) addInDBA.add(colValueList)
-            else xorInDBA.add(colValueList)
+            if (!idInTempColValueListsB.contains(colValueList[0])) addInDbAColValueLists.add(colValueList)
+            else xorInDbAColValueLists.add(colValueList)
     }
 }

@@ -16,18 +16,18 @@ private const val MYSQL_DB_URL = "jdbc:mysql://"
 private const val MYSQL_DB_NAME = "/"
 
 class DbConfig {
-    fun getJdbcDriver(dbType: Byte): String {
+    fun getJdbcDriver(dbType: Int): String {
         return when (dbType) {
-            1.toByte() -> ORACLE_JDBC_DRIVER
-            2.toByte() -> MS_JDBC_DRIVER
+            1 -> ORACLE_JDBC_DRIVER
+            2 -> MS_JDBC_DRIVER
             else -> MYSQL_JDBC_DRIVER
         }
     }
 
-    fun getDbUrl(dbType: Byte, dbUrl: String, dbName: String): String {
+    fun getDbUrl(dbType: Int, dbUrl: String, dbName: String): String {
         return when (dbType) {
-            1.toByte() -> ORACLE_DB_URL + dbUrl + ORACLE_DB_NAME + dbName
-            2.toByte() -> MS_DB_URL + dbUrl + MS_DB_NAME + dbName
+            1 -> ORACLE_DB_URL + dbUrl + ORACLE_DB_NAME + dbName
+            2 -> MS_DB_URL + dbUrl + MS_DB_NAME + dbName
             else -> MYSQL_DB_URL + dbUrl + MYSQL_DB_NAME + dbName
         }
     }
