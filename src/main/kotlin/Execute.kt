@@ -90,7 +90,7 @@ class Execute(
                 statusBox.append("Running SqlStringCreator...\n")
 
                 // Put Value to Set Map (Create Set)
-                createSet["IS_SYNC"] = true
+                createSet["IS_SYNC"] = false
                 // End
 
                 for (colValueLists in selectA.colValuePackage)

@@ -16,10 +16,10 @@ private class StartButton {
     fun init() { window.btnStart.addActionListener(Click()) }
 
     private class Click: ActionListener {
-        override fun actionPerformed(e: ActionEvent?) { Start().start() }
+        override fun actionPerformed(e: ActionEvent?) { Work().start() }
     }
 
-    private class Start {
+    private class Work {
         fun start() {
             var warning = 0
             var error = false
